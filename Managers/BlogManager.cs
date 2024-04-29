@@ -46,12 +46,18 @@ namespace BlogWebApiDotNet.Managers {
         public async Task<ActionResult> CreateNew(BlogDTO blogBody, string loggedInUserId) {
 
             var newBlog = Blog.FromModel(blogBody);
-            newBlog.Userid = loggedInUserId;
+
+            var author = await _DBContext.Users.FirstAsync(x => x.Id == loggedInUserId);
+            if (author == null) {
+                return Forbid();
+            }
+
+            newBlog.User = author;
 
             try {
                 await _DBContext.Blogs.AddAsync(newBlog);
                 await _DBContext.SaveChangesAsync();
-                return StatusCode(StatusCodes.Status201Created, newBlog);
+                return StatusCode(StatusCodes.Status201Created, BlogDTOReturn.FromBlog(newBlog));
 
             } catch (Exception e) {
                 Console.WriteLine(e.Message);
