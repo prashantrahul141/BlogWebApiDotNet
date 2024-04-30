@@ -1,35 +1,29 @@
-using System.Collections;
-using System.Security.Claims;
-using System.Text.Json;
+using BlogWebApiDotNet.Managers;
+using BlogWebApiDotNet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApiDotNet.Controllers {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase {
+    public class UserController(IUserManager m_userManager, ILogger<UserController> m_logger) : ControllerBase {
+        private readonly UserManager userManager = (UserManager)m_userManager;
+
+        // The dotnet core handles logging using this ILogger.
+        private readonly ILogger<UserController> logger = m_logger;
+
+
 
         [HttpGet("GetLoggedInUser"), Authorize]
-        public ActionResult GetLoggedInUser() {
-            var userData = new Hashtable() {
-                {"userId",GetUserClaimIdentity(ClaimTypes.NameIdentifier)},
-                {"email",GetUserClaimIdentity(ClaimTypes.Email)},
-                {"name",GetUserClaimIdentity(ClaimTypes.Name)}
-            };
-
-            return StatusCode(StatusCodes.Status200OK, JsonSerializer.Serialize(userData));
-
+        public ActionResult<UserPublicDTO> GetLoggedInUser() {
+            return userManager.GetLoggedInUser(User);
         }
 
 
-        private string GetUserClaimIdentity(string claimType) {
-            var claimsIdentityRaw = User.Identity ?? throw new Exception("Identity of user is null");
-            var claimsIdentity = (ClaimsIdentity)claimsIdentityRaw ?? throw new Exception("Cannot convert Claims Identity.");
-            var claims = claimsIdentity.FindFirst(claimType) ?? throw new Exception($"Cannot find name {claimType} of identity.");
-            return claims.ToString().Split(":").Last().Trim();
+        [HttpGet("GetLoggedInUserImage"), Authorize]
+        public async Task<ActionResult<string>> GetLoggedInUserImage() {
+            return await userManager.GetLoggedInUserImage(User);
         }
-
-
 
     }
 
