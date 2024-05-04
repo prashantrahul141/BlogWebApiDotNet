@@ -32,13 +32,13 @@ builder.Services.AddSwaggerGen(options => {
 string PG_CONNECTION_STRING = $"Host={EnvLoader.GetKeyOrThrow("PG_HOST")};Database={EnvLoader.GetKeyOrThrow("PG_DATABASE")};Username={EnvLoader.GetKeyOrThrow("PG_USERNAME")};Password={EnvLoader.GetKeyOrThrow("PG_PASSWORD")};Include Error Detail=True";
 builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(PG_CONNECTION_STRING));
 
-builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<DataContext>().AddApiEndpoints();
+builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<DataContext>().AddApiEndpoints();
 
 builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
 builder.Services.AddAuthorizationBuilder();
 
 builder.Services.AddScoped<IBlogManager, BlogManager>();
-builder.Services.AddScoped<IUserManager, UserManager>();
+builder.Services.AddScoped<IUserManager, AppUserManager>();
 
 
 var app = builder.Build();
@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
-app.MapIdentityApi<User>();
+app.MapIdentityApi<AppUser>();
 
 app.UseHttpsRedirection();
 

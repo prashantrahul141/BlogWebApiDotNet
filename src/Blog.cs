@@ -12,7 +12,7 @@ namespace BlogWebApiDotNet {
 
         public string? Userid { get; set; }
 
-        public virtual User? User { get; set; }
+        public virtual AppUser? User { get; set; }
 
         public Blog() { }
 
