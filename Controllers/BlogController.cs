@@ -13,9 +13,8 @@ namespace BlogWebApiDotNet.Controllers {
         private readonly ILogger<BlogsController> logger = m_logger;
 
 
-
         [HttpGet("GetAll")]
-        public async Task<List<Blog>> GetAllBlogs() {
+        public async Task<List<BlogDTOReturn>> GetAllBlogs() {
             return await blogManager.GetAll();
         }
 

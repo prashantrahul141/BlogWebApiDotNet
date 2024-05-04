@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApiDotNet.Managers {
     public interface IBlogManager {
-        public Task<List<Blog>> GetAll();
+        public Task<List<BlogDTOReturn>> GetAll();
 
         public Task<ActionResult<Blog>> GetByBlogId(long BlogId);
 
@@ -25,8 +25,8 @@ namespace BlogWebApiDotNet.Managers {
             _DBContext.Database.EnsureCreated();
         }
 
-        public async Task<List<Blog>> GetAll() {
-            return await _DBContext.Blogs.ToListAsync();
+        public async Task<List<BlogDTOReturn>> GetAll() {
+            return await _DBContext.Blogs.Include(e => e.User).Select(e => BlogDTOReturn.FromBlog(e)).ToListAsync();
         }
 
         public async Task<ActionResult<Blog>> GetByBlogId(long BlogId) {
