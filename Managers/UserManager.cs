@@ -1,9 +1,7 @@
 using System.Security.Claims;
 using BlogWebApiDotNet.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace BlogWebApiDotNet.Managers {
 
@@ -14,21 +12,64 @@ namespace BlogWebApiDotNet.Managers {
 
         public Task<ActionResult<string>> GetUserImage(string userId);
 
+        public Task<ActionResult<UserPublicDTO>> UpdateUser(ClaimsPrincipal user, UserLeastImportantDTO userNewData);
+
     }
 
 
-    public class AppUserManager(DataContext m_dataContext, IUserStore<AppUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<AppUser> passwordHasher, IEnumerable<IUserValidator<AppUser>> userValidators, IEnumerable<IPasswordValidator<AppUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<AppUser>> logger) : UserManager<AppUser>(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger), IUserManager {
+    public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager {
         private readonly DataContext _DbContext = m_dataContext;
 
+        public async Task<ActionResult<UserPublicDTO>> UpdateUser(ClaimsPrincipal user, UserLeastImportantDTO userNewData) {
+            var loggedInUser = await GetLoggedInUser(user);
+            if (loggedInUser.Value == null) {
+                return Unauthorized();
+            }
+
+            var loggedInUserObject = await _DbContext.Users.FirstOrDefaultAsync(user => user.Id == loggedInUser.Value.userId);
+            if (loggedInUserObject == null) {
+                return Unauthorized();
+            }
+
+            var existsUser = await _DbContext.Users.FirstOrDefaultAsync(user => user.UserName == userNewData.Username && user.Id != loggedInUserObject.Id);
+            if (existsUser != null) {
+                return StatusCode(StatusCodes.Status403Forbidden, "Username already taken.");
+            }
+
+            loggedInUserObject.UserName = userNewData.Username;
+            loggedInUserObject.NormalizedUserName = userNewData.Username.ToUpper();
+            loggedInUserObject.Image = userNewData.Avatar;
+
+            try {
+                await _DbContext.SaveChangesAsync();
+                return StatusCode(StatusCodes.Status202Accepted, new UserPublicDTO() {
+                    userId = loggedInUserObject.Id,
+                    Email = loggedInUserObject.Email ?? "",
+                    Name = loggedInUserObject.UserName ?? "",
+                    Image = loggedInUserObject.Image
+                });
+
+            } catch (Exception e) {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error, failed to update uesr");
+            }
+
+
+        }
 
         public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user) {
-            var userImage = await GetLoggedInUserImage(user);
+            var claimUserId = GetUserClaimIdentity(user, ClaimTypes.NameIdentifier);
+            var loggedInUser = await _DbContext.Users.FirstOrDefaultAsync(user => user.Id == claimUserId);
+
+            if (loggedInUser == null) {
+                return Unauthorized();
+            }
 
             return new UserPublicDTO() {
-                Email = GetUserClaimIdentity(user, ClaimTypes.Email),
-                userId = GetUserClaimIdentity(user, ClaimTypes.NameIdentifier),
-                Name = GetUserClaimIdentity(user, ClaimTypes.Name),
-                Image = userImage.Value!
+                userId = loggedInUser.Id,
+                Email = loggedInUser.Email ?? "",
+                Name = loggedInUser.UserName ?? "",
+                Image = loggedInUser.Image ?? "",
             };
         }
 
