@@ -7,20 +7,26 @@ namespace BlogWebApiDotNet.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class UserController(IUserManager m_userManager, ILogger<UserController> m_logger) : ControllerBase {
-        private readonly AppUserManager customUserManager = (AppUserManager)m_userManager;
+        private readonly AppUserManager userManager = (AppUserManager)m_userManager;
 
         // The dotnet core handles logging using this ILogger.
         private readonly ILogger<UserController> logger = m_logger;
 
         [HttpGet("GetLoggedInUser"), Authorize]
         public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser() {
-            return await customUserManager.GetLoggedInUser(User);
+            return await userManager.GetLoggedInUser(User);
         }
 
 
         [HttpGet("GetLoggedInUserImage"), Authorize]
         public async Task<ActionResult<string>> GetLoggedInUserImage() {
-            return await customUserManager.GetLoggedInUserImage(User);
+            return await userManager.GetLoggedInUserImage(User);
+        }
+
+        [HttpPatch("UpdateUser"), Authorize]
+        public async Task<ActionResult<UserPublicDTO>> UpdateUser([FromBody] UserLeastImportantDTO userNewData) {
+            return await userManager.UpdateUser(User, userNewData);
+
         }
 
     }
