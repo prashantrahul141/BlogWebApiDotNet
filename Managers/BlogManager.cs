@@ -26,7 +26,7 @@ namespace BlogWebApiDotNet.Managers {
         }
 
         public async Task<List<BlogDTOReturn>> GetAll() {
-            return await _DBContext.Blogs.Include(e => e.User).Select(e => BlogDTOReturn.FromBlog(e)).ToListAsync();
+            return await _DBContext.Blogs.Include(e => e.User).OrderByDescending(e => e.Createdat).Select(e => BlogDTOReturn.FromBlog(e)).ToListAsync();
         }
 
         public async Task<ActionResult<Blog>> GetByBlogId(long BlogId) {
