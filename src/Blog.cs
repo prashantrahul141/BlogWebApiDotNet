@@ -8,7 +8,7 @@ namespace BlogWebApiDotNet {
 
         public string Body { get; set; } = string.Empty;
 
-        public DateTime Createdat { get; set; }
+        public DateTime Createdat { get; set; } = DateTime.UtcNow;
 
         public string? Userid { get; set; }
 
