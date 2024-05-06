@@ -18,4 +18,10 @@
 
         public string Image { get; set; } = string.Empty;
     }
+
+    public class UserLeastImportantDTO {
+        public required string Username { get; set; }
+
+        public required string Avatar { get; set; } = string.Empty;
+    }
 };
