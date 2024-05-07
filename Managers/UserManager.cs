@@ -17,6 +17,8 @@ namespace BlogWebApiDotNet.Managers
             ClaimsPrincipal user,
             UserLeastImportantDTO userNewData
         );
+
+        public Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId);
     }
 
     public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager
@@ -113,6 +115,17 @@ namespace BlogWebApiDotNet.Managers
             }
 
             return user.Image;
+        }
+
+        public async Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId)
+        {
+            var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return UserLeastImportantDTO.FromUser(user);
         }
 
         private static string GetUserClaimIdentity(ClaimsPrincipal user, string claimType)
