@@ -27,5 +27,14 @@
         public required string Username { get; set; }
 
         public required string Avatar { get; set; } = string.Empty;
+
+        public static UserLeastImportantDTO FromUser(AppUser user)
+        {
+            return new UserLeastImportantDTO()
+            {
+                Avatar = user.Image,
+                Username = user.UserName ?? ""
+            };
+        }
     }
 };
