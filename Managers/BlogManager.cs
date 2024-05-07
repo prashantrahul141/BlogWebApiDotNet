@@ -9,9 +9,9 @@ namespace BlogWebApiDotNet.Managers
     {
         public Task<List<BlogDTOReturn>> GetAll();
 
-        public Task<ActionResult<Blog>> GetByBlogId(long BlogId);
+        public Task<ActionResult<BlogDTOReturn>> GetByBlogId(long BlogId);
 
-        public Task<ActionResult<List<Blog>>> GetByUserId(string UserId);
+        public Task<ActionResult<List<BlogDTOReturn>>> GetByUserId(string UserId);
 
         public Task<ActionResult> CreateNew(BlogDTO blogBody, string loggedInUserId);
 
@@ -42,20 +42,27 @@ namespace BlogWebApiDotNet.Managers
                 .ToListAsync();
         }
 
-        public async Task<ActionResult<Blog>> GetByBlogId(long BlogId)
+        public async Task<ActionResult<BlogDTOReturn>> GetByBlogId(long BlogId)
         {
-            var result = await _DBContext.Blogs.Where(e => e.Id == BlogId).FirstOrDefaultAsync();
+            var result = await _DBContext
+                .Blogs.Where(e => e.Id == BlogId)
+                .Include(e => e.User)
+                .FirstOrDefaultAsync();
+
             if (result == null)
             {
                 return NotFound();
             }
 
-            return result;
+            return BlogDTOReturn.FromBlog(result);
         }
 
-        public async Task<ActionResult<List<Blog>>> GetByUserId(string UserId)
+        public async Task<ActionResult<List<BlogDTOReturn>>> GetByUserId(string UserId)
         {
-            return await _DBContext.Blogs.Where(e => e.Userid == UserId).ToListAsync();
+            return await _DBContext
+                .Blogs.Where(e => e.Userid == UserId)
+                .Select(blog => BlogDTOReturn.FromBlog(blog))
+                .ToListAsync();
         }
 
         public async Task<ActionResult> CreateNew(BlogDTO blogBody, string loggedInUserId)
@@ -104,7 +111,7 @@ namespace BlogWebApiDotNet.Managers
             }
 
             foundBlog.Title = blogBody.Title;
-            foundBlog.Body = blogBody.Title;
+            foundBlog.Body = blogBody.Body;
 
             try
             {

@@ -23,13 +23,15 @@ namespace BlogWebApiDotNet.Controllers
         }
 
         [HttpGet("GetBlogByBlogId/{BlogId:long}")]
-        public async Task<ActionResult<Blog>> GetBlogByBlogId([FromRoute] long BlogId)
+        public async Task<ActionResult<BlogDTOReturn>> GetBlogByBlogId([FromRoute] long BlogId)
         {
             return await blogManager.GetByBlogId(BlogId);
         }
 
         [HttpGet("GetBlogByUserId/{UserId}")]
-        public async Task<ActionResult<List<Blog>>> GetBlogByUserId([FromRoute] string UserId)
+        public async Task<ActionResult<List<BlogDTOReturn>>> GetBlogByUserId(
+            [FromRoute] string UserId
+        )
         {
             return await blogManager.GetByUserId(UserId);
         }
