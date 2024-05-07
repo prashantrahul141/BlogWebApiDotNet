@@ -1,7 +1,9 @@
 ﻿using BlogWebApiDotNet.Models;
 
-namespace BlogWebApiDotNet {
-    public partial class Blog {
+namespace BlogWebApiDotNet
+{
+    public partial class Blog
+    {
         public long Id { get; set; }
 
         public string Title { get; set; } = string.Empty;
@@ -16,7 +18,7 @@ namespace BlogWebApiDotNet {
 
         public Blog() { }
 
-        public static Blog FromModel(BlogDTO m_blogModel) => new() { Body = m_blogModel.Body, Title = m_blogModel.Title };
-
+        public static Blog FromModel(BlogDTO m_blogModel) =>
+            new() { Body = m_blogModel.Body, Title = m_blogModel.Title };
     }
 }

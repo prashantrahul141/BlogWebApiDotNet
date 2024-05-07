@@ -3,36 +3,50 @@ using BlogWebApiDotNet.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlogWebApiDotNet.Managers {
-
-    public interface IUserManager {
+namespace BlogWebApiDotNet.Managers
+{
+    public interface IUserManager
+    {
         public Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user);
 
         public Task<ActionResult<string>> GetLoggedInUserImage(ClaimsPrincipal user);
 
         public Task<ActionResult<string>> GetUserImage(string userId);
 
-        public Task<ActionResult<UserPublicDTO>> UpdateUser(ClaimsPrincipal user, UserLeastImportantDTO userNewData);
-
+        public Task<ActionResult<UserPublicDTO>> UpdateUser(
+            ClaimsPrincipal user,
+            UserLeastImportantDTO userNewData
+        );
     }
 
-
-    public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager {
+    public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager
+    {
         private readonly DataContext _DbContext = m_dataContext;
 
-        public async Task<ActionResult<UserPublicDTO>> UpdateUser(ClaimsPrincipal user, UserLeastImportantDTO userNewData) {
+        public async Task<ActionResult<UserPublicDTO>> UpdateUser(
+            ClaimsPrincipal user,
+            UserLeastImportantDTO userNewData
+        )
+        {
             var loggedInUser = await GetLoggedInUser(user);
-            if (loggedInUser.Value == null) {
+            if (loggedInUser.Value == null)
+            {
                 return Unauthorized();
             }
 
-            var loggedInUserObject = await _DbContext.Users.FirstOrDefaultAsync(user => user.Id == loggedInUser.Value.userId);
-            if (loggedInUserObject == null) {
+            var loggedInUserObject = await _DbContext.Users.FirstOrDefaultAsync(user =>
+                user.Id == loggedInUser.Value.userId
+            );
+            if (loggedInUserObject == null)
+            {
                 return Unauthorized();
             }
 
-            var existsUser = await _DbContext.Users.FirstOrDefaultAsync(user => user.UserName == userNewData.Username && user.Id != loggedInUserObject.Id);
-            if (existsUser != null) {
+            var existsUser = await _DbContext.Users.FirstOrDefaultAsync(user =>
+                user.UserName == userNewData.Username && user.Id != loggedInUserObject.Id
+            );
+            if (existsUser != null)
+            {
                 return StatusCode(StatusCodes.Status403Forbidden, "Username already taken.");
             }
 
@@ -40,32 +54,44 @@ namespace BlogWebApiDotNet.Managers {
             loggedInUserObject.NormalizedUserName = userNewData.Username.ToUpper();
             loggedInUserObject.Image = userNewData.Avatar;
 
-            try {
+            try
+            {
                 await _DbContext.SaveChangesAsync();
-                return StatusCode(StatusCodes.Status202Accepted, new UserPublicDTO() {
-                    userId = loggedInUserObject.Id,
-                    Email = loggedInUserObject.Email ?? "",
-                    Name = loggedInUserObject.UserName ?? "",
-                    Image = loggedInUserObject.Image
-                });
-
-            } catch (Exception e) {
-                Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error, failed to update uesr");
+                return StatusCode(
+                    StatusCodes.Status202Accepted,
+                    new UserPublicDTO()
+                    {
+                        userId = loggedInUserObject.Id,
+                        Email = loggedInUserObject.Email ?? "",
+                        Name = loggedInUserObject.UserName ?? "",
+                        Image = loggedInUserObject.Image
+                    }
+                );
             }
-
-
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    "Internal server error, failed to update uesr"
+                );
+            }
         }
 
-        public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user) {
+        public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user)
+        {
             var claimUserId = GetUserClaimIdentity(user, ClaimTypes.NameIdentifier);
-            var loggedInUser = await _DbContext.Users.FirstOrDefaultAsync(user => user.Id == claimUserId);
+            var loggedInUser = await _DbContext.Users.FirstOrDefaultAsync(user =>
+                user.Id == claimUserId
+            );
 
-            if (loggedInUser == null) {
+            if (loggedInUser == null)
+            {
                 return Unauthorized();
             }
 
-            return new UserPublicDTO() {
+            return new UserPublicDTO()
+            {
                 userId = loggedInUser.Id,
                 Email = loggedInUser.Email ?? "",
                 Name = loggedInUser.UserName ?? "",
@@ -73,28 +99,33 @@ namespace BlogWebApiDotNet.Managers {
             };
         }
 
-        public async Task<ActionResult<string>> GetLoggedInUserImage(ClaimsPrincipal user) {
+        public async Task<ActionResult<string>> GetLoggedInUserImage(ClaimsPrincipal user)
+        {
             return await GetUserImage(GetUserClaimIdentity(user, ClaimTypes.NameIdentifier));
         }
 
-
-        public async Task<ActionResult<string>> GetUserImage(string userId) {
+        public async Task<ActionResult<string>> GetUserImage(string userId)
+        {
             var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) {
+            if (user == null)
+            {
                 return "https://avatars.githubusercontent.com/u/59825803?v=4";
             }
 
             return user.Image;
         }
 
-
-        private static string GetUserClaimIdentity(ClaimsPrincipal user, string claimType) {
-            var claimsIdentityRaw = user.Identity ?? throw new Exception("Identity of user is null");
-            var claimsIdentity = (ClaimsIdentity)claimsIdentityRaw ?? throw new Exception("Cannot convert Claims Identity.");
-            var claims = claimsIdentity.FindFirst(claimType) ?? throw new Exception($"Cannot find name {claimType} of identity.");
+        private static string GetUserClaimIdentity(ClaimsPrincipal user, string claimType)
+        {
+            var claimsIdentityRaw =
+                user.Identity ?? throw new Exception("Identity of user is null");
+            var claimsIdentity =
+                (ClaimsIdentity)claimsIdentityRaw
+                ?? throw new Exception("Cannot convert Claims Identity.");
+            var claims =
+                claimsIdentity.FindFirst(claimType)
+                ?? throw new Exception($"Cannot find name {claimType} of identity.");
             return claims.ToString().Split(":").Last().Trim();
         }
-
     }
-
 }
