@@ -19,6 +19,8 @@ namespace BlogWebApiDotNet.Managers
         );
 
         public Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId);
+
+        public Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(string username);
     }
 
     public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager
@@ -120,6 +122,17 @@ namespace BlogWebApiDotNet.Managers
         public async Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId)
         {
             var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return UserLeastImportantDTO.FromUser(user);
+        }
+
+        public async Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(string username)
+        {
+            var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
             if (user == null)
             {
                 return NotFound();

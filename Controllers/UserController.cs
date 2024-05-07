@@ -35,12 +35,20 @@ namespace BlogWebApiDotNet.Controllers
             return await userManager.UpdateUser(User, userNewData);
         }
 
-        [HttpGet("GetUserById")]
+        [HttpGet("GetUserById/{userId}")]
         public async Task<ActionResult<UserLeastImportantDTO>> GetUserById(
             [FromRoute] string userId
         )
         {
             return await userManager.GetUserById(userId);
+        }
+
+        [HttpGet("GetUserByUsername/{username}")]
+        public async Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(
+            [FromRoute] string username
+        )
+        {
+            return await userManager.GetUserByUsername(username);
         }
     }
 }
