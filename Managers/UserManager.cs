@@ -68,7 +68,7 @@ namespace BlogWebApiDotNet.Managers
                         UserId = loggedInUserObject.Id,
                         Email = loggedInUserObject.Email ?? "",
                         Username = loggedInUserObject.UserName ?? "",
-                        Image = loggedInUserObject.Image
+                        Avatar = loggedInUserObject.Image
                     }
                 );
             }
@@ -99,7 +99,7 @@ namespace BlogWebApiDotNet.Managers
                 UserId = loggedInUser.Id,
                 Email = loggedInUser.Email ?? "",
                 Username = loggedInUser.UserName ?? "",
-                Image = loggedInUser.Image ?? "",
+                Avatar = loggedInUser.Image ?? "",
             };
         }
 
