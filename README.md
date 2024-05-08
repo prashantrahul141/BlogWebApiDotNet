@@ -1,6 +1,7 @@
 ## Web Apis for a simple blogging app using ASP .NET 8
 
 Web Apis for a simple blogging app using ASP .NET 8, The frontend I made for this can be found here:
+
 **https://github.com/prashantrahul141/dotnet-t3-blogs**
 
 
@@ -16,8 +17,7 @@ This project uses the following packages.
 
 ### Building
 
-Make sure you .NET 8 installed, you can read installation instructions from here : https://learn.microsoft.com/en-us/dotnet/core/install/
-
+Make sure you .NET 8 installed, [Installation instructions](https://learn.microsoft.com/en-us/dotnet/core/install/)
 You can also make sure it's installed by running dotnet
 ```sh
 $ dotnet
@@ -42,7 +42,7 @@ JWT_KEY=
 
 Run build
 ```sh
-dotnet build
+$ dotnet build
 ```
 
 Migrate database, for this you will need to install EF, [Install instructions](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)
