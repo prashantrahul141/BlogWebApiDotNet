@@ -61,6 +61,7 @@ namespace BlogWebApiDotNet.Managers
         {
             return await _DBContext
                 .Blogs.Where(e => e.Userid == UserId)
+                .Include(e => e.User)
                 .Select(blog => BlogDTOReturn.FromBlog(blog))
                 .ToListAsync();
         }
