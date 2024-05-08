@@ -16,7 +16,7 @@ namespace BlogWebApiDotNet.Controllers
         private readonly ILogger<UserController> logger = m_logger;
 
         [HttpGet("GetLoggedInUser"), Authorize]
-        public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser()
+        public async Task<ActionResult<UserDTO>> GetLoggedInUser()
         {
             return await userManager.GetLoggedInUser(User);
         }
@@ -28,23 +28,19 @@ namespace BlogWebApiDotNet.Controllers
         }
 
         [HttpPatch("UpdateUser"), Authorize]
-        public async Task<ActionResult<UserPublicDTO>> UpdateUser(
-            [FromBody] UserLeastImportantDTO userNewData
-        )
+        public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserPublicDTO userNewData)
         {
             return await userManager.UpdateUser(User, userNewData);
         }
 
         [HttpGet("GetUserById/{userId}")]
-        public async Task<ActionResult<UserLeastImportantDTO>> GetUserById(
-            [FromRoute] string userId
-        )
+        public async Task<ActionResult<UserPublicDTO>> GetUserById([FromRoute] string userId)
         {
             return await userManager.GetUserById(userId);
         }
 
         [HttpGet("GetUserByUsername/{username}")]
-        public async Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(
+        public async Task<ActionResult<UserPublicDTO>> GetUserByUsername(
             [FromRoute] string username
         )
         {

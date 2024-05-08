@@ -7,29 +7,29 @@ namespace BlogWebApiDotNet.Managers
 {
     public interface IUserManager
     {
-        public Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user);
+        public Task<ActionResult<UserDTO>> GetLoggedInUser(ClaimsPrincipal user);
 
         public Task<ActionResult<string>> GetLoggedInUserImage(ClaimsPrincipal user);
 
         public Task<ActionResult<string>> GetUserImage(string userId);
 
-        public Task<ActionResult<UserPublicDTO>> UpdateUser(
+        public Task<ActionResult<UserDTO>> UpdateUser(
             ClaimsPrincipal user,
-            UserLeastImportantDTO userNewData
+            UserPublicDTO userNewData
         );
 
-        public Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId);
+        public Task<ActionResult<UserPublicDTO>> GetUserById(string userId);
 
-        public Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(string username);
+        public Task<ActionResult<UserPublicDTO>> GetUserByUsername(string username);
     }
 
     public class AppUserManager(DataContext m_dataContext) : ControllerBase, IUserManager
     {
         private readonly DataContext _DbContext = m_dataContext;
 
-        public async Task<ActionResult<UserPublicDTO>> UpdateUser(
+        public async Task<ActionResult<UserDTO>> UpdateUser(
             ClaimsPrincipal user,
-            UserLeastImportantDTO userNewData
+            UserPublicDTO userNewData
         )
         {
             var loggedInUser = await GetLoggedInUser(user);
@@ -63,12 +63,12 @@ namespace BlogWebApiDotNet.Managers
                 await _DbContext.SaveChangesAsync();
                 return StatusCode(
                     StatusCodes.Status202Accepted,
-                    new UserPublicDTO()
+                    new UserDTO()
                     {
                         UserId = loggedInUserObject.Id,
                         Email = loggedInUserObject.Email ?? "",
                         Username = loggedInUserObject.UserName ?? "",
-                        Avatar = loggedInUserObject.Image
+                        Image = loggedInUserObject.Image
                     }
                 );
             }
@@ -82,7 +82,7 @@ namespace BlogWebApiDotNet.Managers
             }
         }
 
-        public async Task<ActionResult<UserPublicDTO>> GetLoggedInUser(ClaimsPrincipal user)
+        public async Task<ActionResult<UserDTO>> GetLoggedInUser(ClaimsPrincipal user)
         {
             var claimUserId = GetUserClaimIdentity(user, ClaimTypes.NameIdentifier);
             var loggedInUser = await _DbContext.Users.FirstOrDefaultAsync(user =>
@@ -94,12 +94,12 @@ namespace BlogWebApiDotNet.Managers
                 return Unauthorized();
             }
 
-            return new UserPublicDTO()
+            return new UserDTO()
             {
                 UserId = loggedInUser.Id,
                 Email = loggedInUser.Email ?? "",
                 Username = loggedInUser.UserName ?? "",
-                Avatar = loggedInUser.Image ?? "",
+                Image = loggedInUser.Image ?? "",
             };
         }
 
@@ -119,7 +119,7 @@ namespace BlogWebApiDotNet.Managers
             return user.Image;
         }
 
-        public async Task<ActionResult<UserLeastImportantDTO>> GetUserById(string userId)
+        public async Task<ActionResult<UserPublicDTO>> GetUserById(string userId)
         {
             var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
@@ -127,10 +127,10 @@ namespace BlogWebApiDotNet.Managers
                 return NotFound();
             }
 
-            return UserLeastImportantDTO.FromUser(user);
+            return UserPublicDTO.FromUser(user);
         }
 
-        public async Task<ActionResult<UserLeastImportantDTO>> GetUserByUsername(string username)
+        public async Task<ActionResult<UserPublicDTO>> GetUserByUsername(string username)
         {
             var user = await _DbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
             if (user == null)
@@ -138,7 +138,7 @@ namespace BlogWebApiDotNet.Managers
                 return NotFound();
             }
 
-            return UserLeastImportantDTO.FromUser(user);
+            return UserPublicDTO.FromUser(user);
         }
 
         private static string GetUserClaimIdentity(ClaimsPrincipal user, string claimType)
