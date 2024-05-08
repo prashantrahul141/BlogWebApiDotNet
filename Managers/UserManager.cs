@@ -39,7 +39,7 @@ namespace BlogWebApiDotNet.Managers
             }
 
             var loggedInUserObject = await _DbContext.Users.FirstOrDefaultAsync(user =>
-                user.Id == loggedInUser.Value.userId
+                user.Id == loggedInUser.Value.UserId
             );
             if (loggedInUserObject == null)
             {
@@ -65,10 +65,10 @@ namespace BlogWebApiDotNet.Managers
                     StatusCodes.Status202Accepted,
                     new UserPublicDTO()
                     {
-                        userId = loggedInUserObject.Id,
+                        UserId = loggedInUserObject.Id,
                         Email = loggedInUserObject.Email ?? "",
-                        Name = loggedInUserObject.UserName ?? "",
-                        Image = loggedInUserObject.Image
+                        Username = loggedInUserObject.UserName ?? "",
+                        Avatar = loggedInUserObject.Image
                     }
                 );
             }
@@ -96,10 +96,10 @@ namespace BlogWebApiDotNet.Managers
 
             return new UserPublicDTO()
             {
-                userId = loggedInUser.Id,
+                UserId = loggedInUser.Id,
                 Email = loggedInUser.Email ?? "",
-                Name = loggedInUser.UserName ?? "",
-                Image = loggedInUser.Image ?? "",
+                Username = loggedInUser.UserName ?? "",
+                Avatar = loggedInUser.Image ?? "",
             };
         }
 
