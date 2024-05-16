@@ -11,7 +11,8 @@ namespace BlogWebApiDotNet.Utils
         {
             if (!File.Exists(m_filePath))
             {
-                throw new Exception("The .env file provided does not exist.");
+                Console.WriteLine(".env file doesn't exist.");
+                return;
             }
 
             foreach (string line in File.ReadAllLines(m_filePath))
@@ -33,9 +34,7 @@ namespace BlogWebApiDotNet.Utils
             {
                 if (environmentVariables[key] == null)
                 {
-                    throw new Exception(
-                        $"Failed to validate environment variable {key} is not set."
-                    );
+                    Console.WriteLine($"Failed to validate environment variable {key} is not set.");
                 }
             }
 
@@ -47,14 +46,14 @@ namespace BlogWebApiDotNet.Utils
         {
             if (!isValidated)
             {
-                throw new Exception(
+                Console.WriteLine(
                     "Env vars has not been validated yet. try running EnvLoader.ValidateEnv() before retrieving it."
                 );
             }
 
             if (!validatedKeys.Contains(key))
             {
-                throw new Exception($"Env var {key} is not validated by LoadDotEnv.");
+                Console.WriteLine($"Env var {key} is not validated by LoadDotEnv.");
             }
 
             return Environment.GetEnvironmentVariable(key)!;
