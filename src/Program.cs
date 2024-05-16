@@ -68,7 +68,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapIdentityApi<AppUser>();
+app.MapGroup("/api/auth").MapIdentityApi<AppUser>();
 
 app.UseHttpsRedirection();
 
