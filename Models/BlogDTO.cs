@@ -1,11 +1,17 @@
 ﻿namespace BlogWebApiDotNet.Models
 {
+    /// <summary>
+    /// Class <c>BlogDTO</c> Models creating new blog by logged in user.
+    /// </summary>
     public class BlogDTO
     {
         public required string Title { get; set; }
         public required string Body { get; set; }
     }
 
+    /// <summary>
+    /// Class <c>BlogDTOReturn</c>  maps 1-1 with the actual blog data.
+    /// </summary>
     public class BlogDTOReturn
     {
         public required long Id { get; set; }
@@ -18,6 +24,9 @@
 
         BlogDTOReturn() { }
 
+        /// <summary>
+        /// Static method <c>FromBlog</c> helper function which converts Blog object into BlogDTOReturn
+        ///  </summary>
         public static BlogDTOReturn FromBlog(Blog b)
         {
             var Username = "unknown";

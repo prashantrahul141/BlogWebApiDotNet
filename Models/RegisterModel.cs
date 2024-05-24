@@ -1,5 +1,8 @@
 namespace BlogWebApiDotNet.Models
 {
+    /// <summary>
+    /// Class <c>RegisterModel</c> Models registration form data.
+    /// </summary>
     public class RegisterModel
     {
         public string? UserName { get; set; }
