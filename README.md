@@ -59,4 +59,4 @@ Then finnaly run the application
 $ dotnet run
 ```
 
-Swagger UI should automatically open in your default browser at http://localhost:3000/swagger/index.html
+Swagger UI should automatically open in your default browser at http://localhost:5248/swagger/index.html
