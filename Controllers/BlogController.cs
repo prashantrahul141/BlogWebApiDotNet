@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogWebApiDotNet.Controllers
 {
+    /// <summar>
+    /// class <c>BlogsController</c>, api endpoints for handling User data.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class BlogsController(IBlogManager m_blogManager, ILogger<BlogsController> m_logger)
@@ -16,18 +19,28 @@ namespace BlogWebApiDotNet.Controllers
         // The dotnet core handles logging using this ILogger.
         private readonly ILogger<BlogsController> logger = m_logger;
 
+
+        /// <summary>
+        /// Gets all blogs
+        /// </summary>
         [HttpGet("GetAll")]
         public async Task<List<BlogDTOReturn>> GetAllBlogs()
         {
             return await blogManager.GetAll();
         }
 
+        /// <summary>
+        /// Gets a specific blogs using its id.
+        /// </summary>
         [HttpGet("GetBlogByBlogId/{BlogId:long}")]
         public async Task<ActionResult<BlogDTOReturn>> GetBlogByBlogId([FromRoute] long BlogId)
         {
             return await blogManager.GetByBlogId(BlogId);
         }
 
+        /// <summary>
+        /// Gets all blogs by a specific user usings its id.
+        /// </summary>
         [HttpGet("GetBlogByUserId/{UserId}")]
         public async Task<ActionResult<List<BlogDTOReturn>>> GetBlogByUserId(
             [FromRoute] string UserId
@@ -36,12 +49,19 @@ namespace BlogWebApiDotNet.Controllers
             return await blogManager.GetByUserId(UserId);
         }
 
+        /// <summary>
+        /// Create a new blog.
+        /// </summary>
         [HttpPost("CreateNew"), Authorize]
         public async Task<ActionResult> CreateNew([FromBody] BlogDTO blogBody)
         {
             return await blogManager.CreateNew(blogBody, GetLoggedInUserId());
         }
 
+
+        /// <summary>
+        /// Updates a blog in-place.
+        /// </summary>
         [HttpPatch("UpdateExisting/{blogId:long}"), Authorize]
         public async Task<ActionResult> UpdateExisting(
             [FromRoute] long blogId,

@@ -5,16 +5,42 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogWebApiDotNet.Managers
 {
+    /// <summary>
+    /// Interface <c>IBlogManager</c> provides all the public apis to perform actions on blogs.
+    /// </summary>
     public interface IBlogManager
     {
+        /// <summary>
+        /// Method <c>GetAll</c> Retrives all the blogs present in the db.
+        /// </summary>
         public Task<List<BlogDTOReturn>> GetAll();
 
+        /// <summary>
+        /// Method <c>GetByBlogId</c> Retrives blog of a specific id.
+        /// </summary>
+        /// <param name="BlogId">Id of the blog</param>
         public Task<ActionResult<BlogDTOReturn>> GetByBlogId(long BlogId);
 
+        /// <summary>
+        /// Method <c>GetByBlogId</c> Retrives all blogs by a specific user.
+        /// </summary>
+        /// <param name="UserId">Id of the user</param>
         public Task<ActionResult<List<BlogDTOReturn>>> GetByUserId(string UserId);
 
+        /// <summary>
+        /// Method <c>CreateNew</c> Creates a new blog.
+        /// </summary>
+        /// <param name="blogBody">blog data to create.</param>
+        /// <param name="loggedInUserId">id of the logged in user.</param>
         public Task<ActionResult> CreateNew(BlogDTO blogBody, string loggedInUserId);
 
+        /// <summary>
+        /// Method <c>UpdateExisting</c> updates a blog in-place.
+        /// </summary>
+        /// <param name="blogId">blog id of the blog to update.</param>
+        /// <param name="blogBody">BlogDto data to update..</param>
+        /// <param name="currentUser">Info about the current logged in user.</param>
+        /// <param name="loggedInUserId">id of the logged in user.</param>
         public Task<ActionResult> UpdateExisting(
             long blogId,
             BlogDTO blogBody,
@@ -23,6 +49,9 @@ namespace BlogWebApiDotNet.Managers
         );
     }
 
+    /// <summary>
+    /// Class <c>BlogManager</c> implements <c>IBlogManager</c>
+    /// </summary>
     public class BlogManager : ControllerBase, IBlogManager
     {
         private readonly DataContext _DBContext;
@@ -33,6 +62,9 @@ namespace BlogWebApiDotNet.Managers
             _DBContext.Database.EnsureCreated();
         }
 
+        /// <summary>
+        /// Method <c>GetAll</c> Retrives all the blogs present in the db.
+        /// </summary>
         public async Task<List<BlogDTOReturn>> GetAll()
         {
             return await _DBContext
@@ -42,6 +74,10 @@ namespace BlogWebApiDotNet.Managers
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Method <c>GetByBlogId</c> Retrives blog of a specific id.
+        /// </summary>
+        /// <param name="BlogId">Id of the blog</param>
         public async Task<ActionResult<BlogDTOReturn>> GetByBlogId(long BlogId)
         {
             var result = await _DBContext
@@ -57,6 +93,10 @@ namespace BlogWebApiDotNet.Managers
             return BlogDTOReturn.FromBlog(result);
         }
 
+        /// <summary>
+        /// Method <c>GetByBlogId</c> Retrives all blogs by a specific user.
+        /// </summary>
+        /// <param name="UserId">Id of the user</param>
         public async Task<ActionResult<List<BlogDTOReturn>>> GetByUserId(string UserId)
         {
             return await _DBContext
@@ -66,6 +106,11 @@ namespace BlogWebApiDotNet.Managers
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Method <c>CreateNew</c> Creates a new blog.
+        /// </summary>
+        /// <param name="blogBody">blog data to create.</param>
+        /// <param name="loggedInUserId">id of the logged in user.</param>
         public async Task<ActionResult> CreateNew(BlogDTO blogBody, string loggedInUserId)
         {
             var newBlog = Blog.FromModel(blogBody);
@@ -91,6 +136,13 @@ namespace BlogWebApiDotNet.Managers
             }
         }
 
+        /// <summary>
+        /// Method <c>UpdateExisting</c> updates a blog in-place.
+        /// </summary>
+        /// <param name="blogId">blog id of the blog to update.</param>
+        /// <param name="blogBody">BlogDto data to update..</param>
+        /// <param name="currentUser">Info about the current logged in user.</param>
+        /// <param name="loggedInUserId">id of the logged in user.</param>
         public async Task<ActionResult> UpdateExisting(
             long blogId,
             BlogDTO blogBody,
